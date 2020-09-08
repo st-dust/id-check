@@ -44,18 +44,21 @@ public class MainView extends VerticalLayout {
     }
 
     private boolean previousCheckEndedWithUnemployedPerson = false;
+    private boolean dialogHasToPopUp = false;
 
     public MainView(@Autowired GetInfoService service) {
 
         TextField textField = new TextField("ID ke kontrole");
         textField.addThemeName("bordered");
 
+        textField.setPlaceholder("Sem vložte ID");
+        textField.setAutoselect(true);
+        textField.setClearButtonVisible(true);
+
         addClassName("centered-content");
 
-        Dialog dialog = new Dialog();
-        dialog.add(new Text(""));
-
         Tabs tabs = new Tabs();
+
         Tab isAnEmployeeTab = new Tab();
         Tab nameTab = new Tab();
         Tab departmentTab = new Tab();
@@ -63,52 +66,44 @@ public class MainView extends VerticalLayout {
         tabs.add(isAnEmployeeTab, nameTab, departmentTab);
         tabs.setOrientation(Tabs.Orientation.VERTICAL);
 
-        //dialog.add(tabs);
-
-        Accordion accordion = new Accordion();
-
-        dialog.add(accordion);
-
+        Dialog dialog = new Dialog();
+        dialog.add(new Text(""));
         dialog.setWidth("700px");
         dialog.setHeight("450px");
+
+        dialog.add(tabs);
 
         Button button = new Button("Ověřit ID",
                 (e -> {
                     if(!checkIfIsNumeric(textField.getValue())) {
 
-                        dialog.removeAll();
-                        dialog.add(new Text("Zadaná hodnota není platná"));
+                        textField.setInvalid(true);
+                        textField.setErrorMessage("Zadaná hodnota není platná");
 
+                        dialogHasToPopUp = false;
                     } else if (service.isAnEmployee(Integer.parseInt(textField.getValue()))) {
-
-                        dialog.removeAll();
-                        dialog.add(tabs);
-
-                        if (previousCheckEndedWithUnemployedPerson) {
-                            tabs.add(nameTab, departmentTab);
-                        }
-
                         isAnEmployeeTab.getElement().getStyle().set("color", "green");
 
                         isAnEmployeeTab.setLabel("Je zaměstnanec ZCG");
                         nameTab.setLabel(service.getNameAndSurname(Integer.parseInt(textField.getValue())));
                         departmentTab.setLabel(service.getDepartment(Integer.parseInt(textField.getValue())));
+                        dialogHasToPopUp = true;
                     } else {
-                        dialog.removeAll();
-                        dialog.add(tabs);
 
-                        tabs.remove(nameTab, departmentTab);
-                        isAnEmployeeTab.getElement().getStyle().set("color",
-                                "red");
-                        isAnEmployeeTab.setLabel("Není zaměstnancem ZCG");
-                        previousCheckEndedWithUnemployedPerson = true;
+                        textField.setInvalid(true);
+                        textField.setErrorMessage("Identifikáční číslo " + textField.getValue() + " není vázané na žadného zaměstnance ZCG");
+
+                        dialogHasToPopUp = false;
                     }
                 }));
 
-
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         button.addClickShortcut(Key.ENTER);
-        button.addClickListener(event -> dialog.open());
+        button.addClickListener(event -> {
+            if (dialogHasToPopUp) {
+                dialog.open();
+            }
+        });
 
         add(textField, button);
 
