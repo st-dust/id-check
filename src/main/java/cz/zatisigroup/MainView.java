@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Route("")
 @CssImport("./styles/shared-styles.css")
+//@CssImport("./styles/mytheme-dialog.css")
+@CssImport(value = "./styles/mytheme-dialog.css", themeFor = "vaadin-dialog-overlay")
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
 public class MainView extends VerticalLayout {
 
@@ -43,7 +45,6 @@ public class MainView extends VerticalLayout {
         return true;
     }
 
-    private boolean previousCheckEndedWithUnemployedPerson = false;
     private boolean dialogHasToPopUp = false;
 
     public MainView(@Autowired GetInfoService service) {
@@ -68,9 +69,11 @@ public class MainView extends VerticalLayout {
 
         Dialog dialog = new Dialog();
         dialog.add(new Text(""));
-        dialog.setWidth("700px");
-        dialog.setHeight("450px");
+        dialog.setWidth("50%");
+        dialog.setHeight("30%");
 
+
+        dialog.getElement().getThemeList().add("mytheme-dialog-overlay");
         dialog.add(tabs);
 
         Button button = new Button("Ověřit ID",
@@ -82,7 +85,7 @@ public class MainView extends VerticalLayout {
 
                         dialogHasToPopUp = false;
                     } else if (service.isAnEmployee(Integer.parseInt(textField.getValue()))) {
-                        isAnEmployeeTab.getElement().getStyle().set("color", "green");
+                        //isAnEmployeeTab.getElement().getStyle().set("color", "green");
 
                         isAnEmployeeTab.setLabel("Je zaměstnanec ZCG");
                         nameTab.setLabel(service.getNameAndSurname(Integer.parseInt(textField.getValue())));

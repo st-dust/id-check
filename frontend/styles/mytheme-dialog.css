@@ -1,0 +1,9 @@
+:host([theme~="mytheme-dialog-overlay"]) [part="overlay"] {
+    height:100%;
+    background: #BEFCAE;
+}
+
+:host([theme~="mytheme-dialog-overlay"]) [part="content"] {
+    height:100%;
+    background: #BEFCAE;
+}
