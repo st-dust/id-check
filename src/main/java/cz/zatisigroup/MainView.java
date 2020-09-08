@@ -43,7 +43,7 @@ public class MainView extends VerticalLayout {
         return true;
     }
 
-    private boolean isFirst = true;
+    private boolean previousCheckEndedWithUnemployedPerson = false;
 
     public MainView(@Autowired GetInfoService service) {
 
@@ -53,58 +53,57 @@ public class MainView extends VerticalLayout {
         addClassName("centered-content");
 
         Dialog dialog = new Dialog();
-        dialog.add(new Text("Informace o zamestnanci"));
+        dialog.add(new Text(""));
 
-//        Tab tab1 = new Tab("Je zaměstncem");
-//        Tab tab2 = new Tab("Jméno zaměstnance");
-//        Tab tab3 = new Tab("Středisko");
-//        Tabs tabs = new Tabs(tab1, tab2, tab3);
-//
-//        dialog.add(tabs);
+        Tabs tabs = new Tabs();
+        Tab isAnEmployeeTab = new Tab();
+        Tab nameTab = new Tab();
+        Tab departmentTab = new Tab();
+
+        tabs.add(isAnEmployeeTab, nameTab, departmentTab);
+        tabs.setOrientation(Tabs.Orientation.VERTICAL);
+
+        //dialog.add(tabs);
 
         Accordion accordion = new Accordion();
-
-//        accordion.add("Je zaměstnanec", new Span())
-//                .addThemeVariants(DetailsVariant.FILLED);
-//
-//        accordion.add("Jméno zaměstnance", new Span())
-//                .addThemeVariants(DetailsVariant.FILLED);
-//
-//        accordion.add("Středisko", new Span())
-//                .addThemeVariants(DetailsVariant.FILLED);
 
         dialog.add(accordion);
 
         dialog.setWidth("700px");
         dialog.setHeight("450px");
 
-        //String name = service.getNameAndSurname(checkIfIsNumeric(textField.getValue()) ? Integer.parseInt(textField.getValue()) : -1);
-
-//        Button button = new Button("Ověřít ID",
-//                (e -> Notification.show(service.getNameAndSurname(checkIfIsNumeric(textField.getValue()) ? Integer.parseInt(textField.getValue()) : -1))));
-//        Button button = new Button("Ověřít ID",
-//                (e -> { tabs.set(new TextArea(service.getNameAndSurname(checkIfIsNumeric(textField.getValue()) ? Integer.parseInt(textField.getValue()) : -1))),
-//                        tabs.set(new TextArea(service.getNameAndSurname(checkIfIsNumeric(textField.getValue()) ? Integer.parseInt(textField.getValue()) : -1)));
-//                }));
-
         Button button = new Button("Ověřit ID",
                 (e -> {
-                    if(!isFirst) {
-                        accordion.remove(accordion);
-                    }
+                    if(!checkIfIsNumeric(textField.getValue())) {
 
-                    if (service.isAnEmployee(Integer.parseInt(textField.getValue()))) {
-//                        dialog.add(accordion);
+                        dialog.removeAll();
+                        dialog.add(new Text("Zadaná hodnota není platná"));
 
-                        accordion.add("Je zaměstnanec", new Span("ANO")).addThemeVariants(DetailsVariant.FILLED);
-                        accordion.add("Jméno zaměstnance", new Span(service.getNameAndSurname(Integer.parseInt(textField.getValue())))).addThemeVariants(DetailsVariant.FILLED);
-                        accordion.add("Středisko", new Span(service.getDepartment(Integer.parseInt(textField.getValue())))).addThemeVariants(DetailsVariant.FILLED);
+                    } else if (service.isAnEmployee(Integer.parseInt(textField.getValue()))) {
+
+                        dialog.removeAll();
+                        dialog.add(tabs);
+
+                        if (previousCheckEndedWithUnemployedPerson) {
+                            tabs.add(nameTab, departmentTab);
+                        }
+
+                        isAnEmployeeTab.getElement().getStyle().set("color", "green");
+
+                        isAnEmployeeTab.setLabel("Je zaměstnanec ZCG");
+                        nameTab.setLabel(service.getNameAndSurname(Integer.parseInt(textField.getValue())));
+                        departmentTab.setLabel(service.getDepartment(Integer.parseInt(textField.getValue())));
                     } else {
-                        accordion.add("Je zaměstnanec", new Span("NE")).addThemeVariants(DetailsVariant.FILLED);
-                    }
-                    isFirst = false;
-                }));
+                        dialog.removeAll();
+                        dialog.add(tabs);
 
+                        tabs.remove(nameTab, departmentTab);
+                        isAnEmployeeTab.getElement().getStyle().set("color",
+                                "red");
+                        isAnEmployeeTab.setLabel("Není zaměstnancem ZCG");
+                        previousCheckEndedWithUnemployedPerson = true;
+                    }
+                }));
 
 
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

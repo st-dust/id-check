@@ -22,9 +22,6 @@
     </parent>
 
     <repositories>
-        <!-- The order of definitions matters. Explicitly defining central here to make sure it has the highest priority. -->
-
-        <!-- Main Maven repository -->
         <repository>
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
@@ -32,14 +29,12 @@
                 <enabled>false</enabled>
             </snapshots>
         </repository>
-        <!-- The current version of Flow 3.0 is a pre-release version, so vaadin-prereleases repository is needed. -->
         <repository>
             <id>vaadin-prereleases</id>
             <url>
                 https://maven.vaadin.com/vaadin-prereleases/
             </url>
         </repository>
-        <!-- Repository used by many Vaadin add-ons -->
         <repository>
             <id>Vaadin Directory</id>
             <url>https://maven.vaadin.com/vaadin-addons</url>
@@ -50,7 +45,6 @@
     </repositories>
 
     <pluginRepositories>
-        <!-- Main Maven repository -->
         <pluginRepository>
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
@@ -81,7 +75,6 @@
     <dependencies>
         <dependency>
             <groupId>com.vaadin</groupId>
-            <!-- Replace artifactId with vaadin-core to use only free components -->
             <artifactId>vaadin</artifactId>
         </dependency>
         <dependency>
@@ -225,8 +218,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
-                    <!-- Runs the integration tests (*IT) after the server is started -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-failsafe-plugin</artifactId>
