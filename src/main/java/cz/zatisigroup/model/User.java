@@ -1,6 +1,7 @@
 package cz.zatisigroup.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.springframework.context.annotation.Bean;
 
 import javax.persistence.*;
 
@@ -17,20 +18,8 @@ public class User {
     private String name;
     @Column(name="Last_Name")
     private String surname;
-    @Column(name="Has_Discount")
-    private String hasDiscount;
-    @Column(name="Discount_Value")
-    private String discountValue;
     @Column(name = "Department")
     private String department;
-
-    public String getHasDiscount() {
-        return hasDiscount;
-    }
-
-    public void setHasDiscount(String hasDiscount) {
-        this.hasDiscount = hasDiscount;
-    }
 
     public User() {
     }
@@ -41,14 +30,6 @@ public class User {
 
     public void setDepartment(String department) {
         this.department = department;
-    }
-
-    public String getDiscountValue() {
-        return discountValue;
-    }
-
-    public void setDiscountValue(String discountValue) {
-        this.discountValue = discountValue;
     }
 
     public Integer getId() {

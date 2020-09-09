@@ -11,4 +11,16 @@ public class ConvertToNumeric {
 
         return StringUtils.replaceChars(text, czechAlphabet, alphabeticAlternative);
     }
+
+    public static boolean checkIfIsNumeric(String id) {
+        if (id == null){
+            return false;
+        }
+        try {
+            double d = Integer.parseInt(id);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
 }

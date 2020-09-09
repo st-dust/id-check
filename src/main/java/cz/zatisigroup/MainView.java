@@ -1,10 +1,14 @@
 package cz.zatisigroup;
 
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.tabs.Tab;
-import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextAreaVariant;
 import com.vaadin.flow.router.PreserveOnRefresh;
+import com.vaadin.flow.theme.Theme;
+import com.vaadin.flow.theme.lumo.Lumo;
+import com.vaadin.flow.theme.material.Material;
+import cz.zatisigroup.model.User;
 import cz.zatisigroup.utills.ConvertToNumeric;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,27 +21,19 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
 import org.springframework.web.bind.annotation.RestController;
 
+
+import static cz.zatisigroup.utills.ConvertToNumeric.checkIfIsNumeric;
+
 @PreserveOnRefresh
 @RestController
 @Route("")
 @CssImport("./styles/shared-styles.css")
-@CssImport(value = "./styles/mytheme-dialog.css", themeFor = "vaadin-dialog-overlay")
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
+@Theme(value = Lumo.class, variant = Lumo.DARK)
+
+//@Theme(Material.class)
 public class MainView extends VerticalLayout {
 
-    private static boolean checkIfIsNumeric(String id) {
-        if (id == null){
-            return false;
-        }
-        try {
-            double d = Integer.parseInt(id);
-        } catch (NumberFormatException nfe) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean dialogHasToPopUp = false;
     private String textFieldValue;
 
     public MainView(@Autowired GetInfoService service) {
@@ -50,25 +46,29 @@ public class MainView extends VerticalLayout {
         textField.setAutoselect(true);
         textField.setClearButtonVisible(true);
 
+        User user = new User();
+
+        Grid<User> grid = new Grid<>();
+        TextArea successMessage = new TextArea();
+
+        grid.setItems(user);
+
+
+        grid.addColumn(User::getId).setHeader("ID");
+        grid.addColumn(User::getName).setHeader("Jméno");
+        grid.addColumn(User::getSurname).setHeader("Příjmeni");
+        grid.addColumn(User::getDepartment).setHeader("Středisko");
+
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER,
+                GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
+
+        //addClassName("centered-content");
+        textField.addClassName("centered-content-button-textfield");
+       // successMessage.addClassName("success-message");
+        successMessage.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
+        grid.addClassName("v-grid");
         addClassName("centered-content");
 
-        Tabs tabs = new Tabs();
-
-        Tab isAnEmployeeTab = new Tab();
-        Tab nameTab = new Tab();
-        Tab departmentTab = new Tab();
-
-        tabs.add(isAnEmployeeTab, nameTab, departmentTab);
-        tabs.setOrientation(Tabs.Orientation.VERTICAL);
-
-        Dialog dialog = new Dialog();
-        dialog.add(new Text(""));
-        dialog.setWidth("50%");
-        dialog.setHeight("30%");
-
-
-        dialog.getElement().getThemeList().add("mytheme-dialog-overlay");
-        dialog.add(tabs);
 
         Button button = new Button("Ověřit ID",
                 (e -> {
@@ -78,36 +78,34 @@ public class MainView extends VerticalLayout {
                     if(!checkIfIsNumeric(textFieldValue)) {
                         if(checkIfIsNumeric(ConvertToNumeric.translate(textFieldValue))) {
                             textFieldValue = ConvertToNumeric.translate(textField.getValue());
-                        } else {
-                            textField.setInvalid(true);
-                            textField.setErrorMessage("Zadaná hodnota není platná");
-
-                            dialogHasToPopUp = false;
                         }
                     }
-                    
+
                     if (service.isAnEmployee(Integer.parseInt(textFieldValue))) {
+                        int textFieldIntValue = Integer.parseInt(textFieldValue);
 
-                        isAnEmployeeTab.setLabel("Je zaměstnanec ZCG");
-                        nameTab.setLabel(service.getNameAndSurname(Integer.parseInt(textFieldValue)));
-                        departmentTab.setLabel(service.getDepartment(Integer.parseInt(textFieldValue)));
-                        dialogHasToPopUp = true;
+                        user.setId(textFieldIntValue);
+                        user.setName(service.getNameById(textFieldIntValue));
+                        user.setSurname(service.getSurnameById(textFieldIntValue));
+                        user.setDepartment(service.getDepartment(textFieldIntValue));
+
+
+                        grid.setItems(user);
+                        successMessage.setValue( user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
+                        successMessage.setReadOnly(true);
+
+                        add(successMessage, grid);
                     } else {
-
+                        remove(grid, successMessage);
                         textField.setInvalid(true);
-                        textField.setErrorMessage("Identifikáční číslo " + textFieldValue + " není vázané na žadného zaměstnance ZCG");
+                        textField.setErrorMessage("Identifikátor nenalezen. Není nárok na slevu");
 
-                        dialogHasToPopUp = false;
                     }
                 }));
 
+        button.setClassName("centered-content-button-textfield");
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         button.addClickShortcut(Key.ENTER);
-        button.addClickListener(event -> {
-            if (dialogHasToPopUp) {
-                dialog.open();
-            }
-        });
 
         add(textField, button);
 
