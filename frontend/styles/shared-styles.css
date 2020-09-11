@@ -1,0 +1,27 @@
+
+.centered-content {
+  margin: 10% auto;
+  max-width: 40%;
+}
+
+.centered-content-button-textfield {
+  margin: 1% auto;
+  width: 35%;
+}
+
+.success-message {
+  outline: 0;
+  color: red;
+  font-size: 140%;
+  border-radius: 5px;
+  background: #519613;
+  margin: 1% auto;
+  width: 98%;
+}
+
+.v-grid {
+  margin: 1%;
+}
+
+
+
