@@ -35,6 +35,7 @@ import static cz.zatisigroup.utills.ConvertToNumeric.checkIfIsNumeric;
 public class MainView extends VerticalLayout {
 
     private String textFieldValue;
+    private boolean isNonsense = false;
 
     public MainView(@Autowired GetInfoService service) {
 
@@ -50,14 +51,18 @@ public class MainView extends VerticalLayout {
 
         Grid<User> grid = new Grid<>();
         TextArea successMessage = new TextArea();
+        successMessage.setReadOnly(true);
+        //successMessage.addClassName("success-message");
 
         grid.setItems(user);
 
 
         grid.addColumn(User::getId).setHeader("ID");
+        grid.addColumn(User::getPersonalNumber).setHeader("Osobní číslo");
         grid.addColumn(User::getName).setHeader("Jméno");
         grid.addColumn(User::getSurname).setHeader("Příjmeni");
         grid.addColumn(User::getDepartment).setHeader("Středisko");
+        grid.addColumn(User::getDepartmentID).setHeader("ID střediska");
 
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER,
                 GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
@@ -78,28 +83,32 @@ public class MainView extends VerticalLayout {
                     if(!checkIfIsNumeric(textFieldValue)) {
                         if(checkIfIsNumeric(ConvertToNumeric.translate(textFieldValue))) {
                             textFieldValue = ConvertToNumeric.translate(textField.getValue());
+                        } else {
+                            isNonsense = true;
                         }
                     }
 
-                    if (service.isAnEmployee(Integer.parseInt(textFieldValue))) {
+                    if (!isNonsense && service.isAnEmployee(Integer.parseInt(textFieldValue))) {
                         int textFieldIntValue = Integer.parseInt(textFieldValue);
 
                         user.setId(textFieldIntValue);
+                        user.setPersonalNumber(service.getPersonalNumber(textFieldIntValue));
                         user.setName(service.getNameById(textFieldIntValue));
                         user.setSurname(service.getSurnameById(textFieldIntValue));
                         user.setDepartment(service.getDepartment(textFieldIntValue));
-
+                        user.setDepartmentID(service.getDepartmentID(textFieldIntValue));
 
                         grid.setItems(user);
-                        successMessage.setValue( user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
-                        successMessage.setReadOnly(true);
+                        successMessage.setValue(user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
+                        successMessage.addClassName("success-message");
+
 
                         add(successMessage, grid);
                     } else {
                         remove(grid, successMessage);
                         textField.setInvalid(true);
                         textField.setErrorMessage("Identifikátor nenalezen. Není nárok na slevu");
-
+                        isNonsense = false;
                     }
                 }));
 

@@ -14,16 +14,27 @@ public class User {
     @GeneratedValue
     @Column(name="ID")
     private Integer id;
+    @Column(name = "Personal_Number")
+    private String personalNumber;
     @Column(name="First_Name")
     private String name;
     @Column(name="Last_Name")
     private String surname;
     @Column(name = "Department")
     private String department;
+    @Column(name = "Department_ID")
+    private String departmentID;
 
     public User() {
     }
 
+    public String getDepartmentID() {
+        return departmentID;
+    }
+
+    public void setDepartmentID(String departmentID) {
+        this.departmentID = departmentID;
+    }
     public String getDepartment() {
         return department;
     }
@@ -38,6 +49,14 @@ public class User {
 
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public String getPersonalNumber() {
+        return personalNumber;
+    }
+
+    public void setPersonalNumber(String personalNumber) {
+        this.personalNumber = personalNumber;
     }
 
     public String getName() {
