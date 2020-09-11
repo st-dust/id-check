@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Service
 public class GetInfoService implements Serializable {
 
+    public String getDepartmentID;
     @Autowired
     private UsersRepository userRepository;
 
@@ -21,6 +22,8 @@ public class GetInfoService implements Serializable {
     public String getNameById(int id) {
         return userRepository.findById(id).orElse(null).getName();
     }
+
+    public String getPersonalNumber(int id) { return userRepository.findById(id).orElse(null).getPersonalNumber(); }
 
     public String getSurnameById(int id) {
         return userRepository.findById(id).orElse(null).getSurname();
@@ -33,5 +36,7 @@ public class GetInfoService implements Serializable {
     public String getDepartment(int id) {
         return userRepository.findById(id).orElse(null).getDepartment();
     }
+
+    public String getDepartmentID(int id) { return userRepository.findById(id).orElse(null).getDepartmentID(); }
 
 }
