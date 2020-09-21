@@ -2,6 +2,8 @@ package cz.zatisigroup.utills;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Optional;
+
 public class ConvertToNumeric {
     public static String translate(String text) {
         String czechAlphabet = "+ěščřžýáíé";
@@ -12,15 +14,16 @@ public class ConvertToNumeric {
         return StringUtils.replaceChars(text, czechAlphabet, alphabeticAlternative);
     }
 
-    public static boolean checkIfIsNumeric(String id) {
-        if (id == null){
-            return false;
-        }
+    public static Optional<Integer> getNumber(String id) {
+        return Optional.ofNullable(checkIfIsNumeric(translate(id)));
+    }
+
+    public static Integer checkIfIsNumeric(String id) {
+        // TODO remove unused variable
         try {
-            double d = Integer.parseInt(id);
+            return Integer.parseInt(id);
         } catch (NumberFormatException nfe) {
-            return false;
+            return null;
         }
-        return true;
     }
 }

@@ -8,6 +8,7 @@ import javax.persistence.*;
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name="workers")
+//TODO use lombook library optional
 public class User {
 
     @Id

@@ -23,19 +23,22 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.RestController;
 
 
-import static cz.zatisigroup.utills.ConvertToNumeric.checkIfIsNumeric;
+import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
+
+import static cz.zatisigroup.utills.ConvertToNumeric.*;
 
 @PreserveOnRefresh
 @RestController
 @Scope("request")
 @Route("")
-@CssImport("./styles/shared-styles.css")
+@CssImport(value = "./styles/shared-styles.css")
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
-//@Theme(value = Lumo.class, variant = Lumo.DARK)
+@Theme(value = Lumo.class, variant = Lumo.DARK)
 public class MainView extends VerticalLayout {
 
-    private String textFieldValue;
-    private boolean isNonsense = false;
+//    private String textFieldValue;
+//    private boolean isNonsense = false;
 
     public MainView(@Autowired GetInfoService service) {
 
@@ -52,7 +55,7 @@ public class MainView extends VerticalLayout {
         Grid<User> grid = new Grid<>();
         TextArea successMessage = new TextArea();
         successMessage.setReadOnly(true);
-        successMessage.addClassName("success-message");
+        successMessage.setClassName("success-message");
         grid.setItems(user);
 
         grid.addColumn(User::getId).setHeader("ID");
@@ -66,48 +69,58 @@ public class MainView extends VerticalLayout {
                 GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
         //addClassName("centered-content");
-        textField.addClassName("centered-content-button-textfield");
-       // successMessage.addClassName("success-message");
+        textField.setClassName("centered-content-button-textfield");
+//        successMessage.setClassName("success-message");
         successMessage.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
-        grid.addClassName("v-grid");
-        addClassName("centered-content");
+        grid.setClassName("v-grid");
+        setClassName("centered-content");
 
         Button button = new Button("Ověřit ID",
                 (e -> {
                     remove(grid, successMessage);
 
-                    textFieldValue = textField.getValue();
+                    //textFieldValue = textField.getValue();
 
-                    if(!checkIfIsNumeric(textFieldValue)) {
-                        if(checkIfIsNumeric(ConvertToNumeric.translate(textFieldValue))) {
-                            textFieldValue = ConvertToNumeric.translate(textField.getValue());
-                        } else {
-                            isNonsense = true;
+//                    if(!checkIfIsNumeric(textFieldValue)) {
+//                        if(checkIfIsNumeric(ConvertToNumeric.translate(textFieldValue))) {
+//                            textFieldValue = ConvertToNumeric.translate(textField.getValue());
+//                        } else {
+//                            isNonsense = true;
+//                        }
+//                    }
+
+                    Optional<Integer> id = getNumber(textField.getValue());
+                    if(id.isPresent()) {
+
+                        try {
+//                    if (!isNonsense && service.isAnEmployee(Integer.parseInt(textFieldValue))) {
+                            int textFieldIntValue = id.get();
+                            // int textFieldIntValue = Integer.parseInt(textFieldValue);
+                            // TODO decrease sql statement count on db
+                            user.setId(textFieldIntValue);
+                            user.setPersonalNumber(service.getPersonalNumber(textFieldIntValue));
+                            user.setName(service.getNameById(textFieldIntValue));
+                            user.setSurname(service.getSurnameById(textFieldIntValue));
+                            user.setDepartment(service.getDepartment(textFieldIntValue));
+                            user.setDepartmentID(service.getDepartmentID(textFieldIntValue));
+
+                            //grid.setItems(user);
+
+                            successMessage.setValue(user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
+                            //successMessage.addClassName("success-message");
+
+                            textField.setValue("");
+                            add(successMessage, grid);
+                        }catch (EntityNotFoundException ex) {
+                            textField.setInvalid(true);
+                            textField.setErrorMessage("Identifikátor nenalezen. Není nárok na slevu");
                         }
-                    }
-
-                    if (!isNonsense && service.isAnEmployee(Integer.parseInt(textFieldValue))) {
-                        int textFieldIntValue = Integer.parseInt(textFieldValue);
-
-                        user.setId(textFieldIntValue);
-                        user.setPersonalNumber(service.getPersonalNumber(textFieldIntValue));
-                        user.setName(service.getNameById(textFieldIntValue));
-                        user.setSurname(service.getSurnameById(textFieldIntValue));
-                        user.setDepartment(service.getDepartment(textFieldIntValue));
-                        user.setDepartmentID(service.getDepartmentID(textFieldIntValue));
-
-                        //grid.setItems(user);
-
-                        successMessage.setValue(user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
-                        //successMessage.addClassName("success-message");
-
-                        textField.setValue("");
-                        add(successMessage, grid);
                     } else {
+
                         //remove(successMessage, grid);
                         textField.setInvalid(true);
                         textField.setErrorMessage("Identifikátor nenalezen. Není nárok na slevu");
-                        isNonsense = false;
+//                        isNonsense = false;
                     }
                 }));
 
