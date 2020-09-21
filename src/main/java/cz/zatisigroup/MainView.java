@@ -19,6 +19,7 @@ import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.Route;
+import org.springframework.context.annotation.Scope;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -26,6 +27,7 @@ import static cz.zatisigroup.utills.ConvertToNumeric.checkIfIsNumeric;
 
 @PreserveOnRefresh
 @RestController
+@Scope("request")
 @Route("")
 @CssImport("./styles/shared-styles.css")
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
