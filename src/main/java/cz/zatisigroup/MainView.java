@@ -7,9 +7,8 @@ import com.vaadin.flow.component.textfield.TextAreaVariant;
 import com.vaadin.flow.router.PreserveOnRefresh;
 import com.vaadin.flow.theme.Theme;
 import com.vaadin.flow.theme.lumo.Lumo;
-import com.vaadin.flow.theme.material.Material;
 import cz.zatisigroup.model.User;
-import cz.zatisigroup.utills.ConvertToNumeric;
+import cz.zatisigroup.service.GetInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vaadin.flow.component.Key;
@@ -36,9 +35,6 @@ import static cz.zatisigroup.utills.ConvertToNumeric.*;
 @CssImport(value = "./styles/vaadin-text-field-styles.css", themeFor = "vaadin-text-field")
 @Theme(value = Lumo.class, variant = Lumo.DARK)
 public class MainView extends VerticalLayout {
-
-//    private String textFieldValue;
-//    private boolean isNonsense = false;
 
     public MainView(@Autowired GetInfoService service) {
 
@@ -68,9 +64,7 @@ public class MainView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER,
                 GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
-        //addClassName("centered-content");
         textField.setClassName("centered-content-button-textfield");
-//        successMessage.setClassName("success-message");
         successMessage.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
         grid.setClassName("v-grid");
         setClassName("centered-content");
@@ -79,23 +73,11 @@ public class MainView extends VerticalLayout {
                 (e -> {
                     remove(grid, successMessage);
 
-                    //textFieldValue = textField.getValue();
-
-//                    if(!checkIfIsNumeric(textFieldValue)) {
-//                        if(checkIfIsNumeric(ConvertToNumeric.translate(textFieldValue))) {
-//                            textFieldValue = ConvertToNumeric.translate(textField.getValue());
-//                        } else {
-//                            isNonsense = true;
-//                        }
-//                    }
-
                     Optional<Integer> id = getNumber(textField.getValue());
                     if(id.isPresent()) {
 
                         try {
-//                    if (!isNonsense && service.isAnEmployee(Integer.parseInt(textFieldValue))) {
                             int textFieldIntValue = id.get();
-                            // int textFieldIntValue = Integer.parseInt(textFieldValue);
                             // TODO decrease sql statement count on db
                             user.setId(textFieldIntValue);
                             user.setPersonalNumber(service.getPersonalNumber(textFieldIntValue));
@@ -104,11 +86,8 @@ public class MainView extends VerticalLayout {
                             user.setDepartment(service.getDepartment(textFieldIntValue));
                             user.setDepartmentID(service.getDepartmentID(textFieldIntValue));
 
-                            //grid.setItems(user);
 
                             successMessage.setValue(user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
-                            //successMessage.addClassName("success-message");
-
                             textField.setValue("");
                             add(successMessage, grid);
                         }catch (EntityNotFoundException ex) {
@@ -116,11 +95,8 @@ public class MainView extends VerticalLayout {
                             textField.setErrorMessage("Identifikátor nenalezen. Není nárok na slevu");
                         }
                     } else {
-
-                        //remove(successMessage, grid);
                         textField.setInvalid(true);
                         textField.setErrorMessage("Identifikátor nenalezen. Není nárok na slevu");
-//                        isNonsense = false;
                     }
                 }));
 
@@ -129,7 +105,5 @@ public class MainView extends VerticalLayout {
         button.addClickShortcut(Key.ENTER);
 
         add(textField, button);
-
-
     }
 }
