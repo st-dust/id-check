@@ -46,13 +46,10 @@ public class MainView extends VerticalLayout {
         textField.setAutoselect(true);
         textField.setClearButtonVisible(true);
 
-        User user = new User();
-
         Grid<User> grid = new Grid<>();
         TextArea successMessage = new TextArea();
         successMessage.setReadOnly(true);
         successMessage.setClassName("success-message");
-        grid.setItems(user);
 
         grid.addColumn(User::getId).setHeader("ID");
         grid.addColumn(User::getPersonalNumber).setHeader("Osobní číslo");
@@ -75,24 +72,20 @@ public class MainView extends VerticalLayout {
 
                     Optional<Integer> id = getNumber(textField.getValue());
                     if(id.isPresent()) {
-
                         try {
                             int textFieldIntValue = id.get();
-                            // TODO decrease sql statement count on db
-                            user.setId(textFieldIntValue);
-                            user.setPersonalNumber(service.getPersonalNumber(textFieldIntValue));
-                            user.setName(service.getNameById(textFieldIntValue));
-                            user.setSurname(service.getSurnameById(textFieldIntValue));
-                            user.setDepartment(service.getDepartment(textFieldIntValue));
-                            user.setDepartmentID(service.getDepartmentID(textFieldIntValue));
 
+                            User user = service.getWholeUser(textFieldIntValue);
+                            grid.setItems(user);
 
                             successMessage.setValue(user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
                             textField.setValue("");
                             add(successMessage, grid);
+
                         }catch (EntityNotFoundException ex) {
                             textField.setInvalid(true);
                             textField.setErrorMessage("Identifikátor nenalezen. Není nárok na slevu");
+
                         }
                     } else {
                         textField.setInvalid(true);
