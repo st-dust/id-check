@@ -1,7 +1,6 @@
 package cz.zatisigroup.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.springframework.context.annotation.Bean;
 
 import javax.persistence.*;
 
@@ -36,6 +35,7 @@ public class User {
     public void setDepartmentID(String departmentID) {
         this.departmentID = departmentID;
     }
+
     public String getDepartment() {
         return department;
     }

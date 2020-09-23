@@ -2,7 +2,7 @@ package cz.zatisigroup.service;
 
 public interface InfoService {
 
-    //TODO method declaration and documentation - javadoc
+    //TODO methods documentation - javadoc
     String getPersonalNumber(int id);
     String getName(int id);
     String getSurname(int id);
