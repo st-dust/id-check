@@ -1,0 +1,21 @@
+server.port=
+spring.datasource.url=
+spring.datasource.driver-class-name=
+spring.datasource.username=
+spring.datasource.password=
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.generate-ddl=true
+spring.jpa.show-sql=true
+
+
+logging.level.org.atmosphere = warn
+spring.mustache.check-template-location = false
+
+logging.level.s7.Application=WARN
+logging.level.org.springframework.web=ERROR
+logging.level.cz.zatisigroup=DEBUG
+
+logging.pattern.file="%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+logging.file.name=
+
