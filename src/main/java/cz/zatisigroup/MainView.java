@@ -1,7 +1,14 @@
 package cz.zatisigroup;
 
+import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.charts.model.Background;
+import com.vaadin.flow.component.details.Details;
+import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextAreaVariant;
 import com.vaadin.flow.theme.Theme;
@@ -36,19 +43,18 @@ import static cz.zatisigroup.utills.ConvertToNumeric.*;
 
 public class MainView extends VerticalLayout {
     Logger log = LoggerFactory.getLogger(MainView.class);
-    public MainView(@Autowired GetInfoService service) {
 
+    public MainView(@Autowired GetInfoService service) {
         TextField textField = new TextField("ID ke kontrole");
-        textField.addThemeName("bordered");
         textField.setAutofocus(true);
 
         textField.setPlaceholder("Sem vložte ID");
-        textField.setAutoselect(true);
         textField.setClearButtonVisible(true);
+
+        Details details = new Details();
 
         Grid<User> grid = new Grid<>();
         TextArea successMessage = new TextArea();
-        successMessage.setReadOnly(true);
         successMessage.setClassName("success-message");
 
         grid.addColumn(User::getId).setHeader("ID");
@@ -61,7 +67,7 @@ public class MainView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER, GridVariant.LUMO_NO_ROW_BORDERS, GridVariant.LUMO_ROW_STRIPES);
 
         textField.setClassName("centered-content-button-textfield");
-        successMessage.addThemeVariants(TextAreaVariant.LUMO_ALIGN_CENTER);
+
         grid.setClassName("v-grid");
         setClassName("centered-content");
 
@@ -74,10 +80,10 @@ public class MainView extends VerticalLayout {
                         try {
                             int textFieldIntValue = id.get();
 
-                            User user = service.getWholeUser(textFieldIntValue);
+                            User user = service.getUserById(textFieldIntValue);
                             grid.setItems(user);
 
-                            successMessage.setValue(user.getName() + " " + user.getSurname() + " je zaměstnan/a v ZCG");
+                            successMessage.setValue(user.getName() + " " + user.getSurname() + " je zaměstnán/a v ZCG");
                             textField.setValue("");
                             add(successMessage, grid);
 
